@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Contact Us - Content My Trip{% endblock %}
+{% block content %}
+{% include "auth/_legal_styles.html" %}
+<div class="container terms-page">
+<header class="terms-hero"><p class="terms-kicker">Content My Trip</p><h1>Contact Us</h1><p>How to reach Content My Trip about payments, refunds, your account or anything else.</p><div class="terms-meta"><span>Effective: 6 October 2026</span><span>Version 1.0</span></div></header>
+<div class="terms-layout">
+<nav class="terms-nav" aria-label="On this page"><strong>Sections</strong><a href="#reach">1. Reach us</a><a href="#business">2. Business details</a><a href="#support">3. Account support</a><strong>Related</strong><a href="/auth/terms">Terms and Conditions</a><a href="/auth/privacy">Privacy Policy</a><a href="/auth/refunds">Refunds &amp; Cancellation</a><a href="/auth/contact">Contact Us</a></nav>
+<article class="terms-document">
+
+<h2 id="reach">1. Reach us</h2><p>Email is the fastest way to reach us about payments, refunds, your account, a video, or a privacy request: <a href="mailto:{{ support_email }}">{{ support_email }}</a>.{% if support_phone %} You can also call {{ support_phone }}.{% endif %}</p><div class="terms-callout">For a payment or refund question, include the receipt number from your payment receipt and the email address on your account.</div>
+<h2 id="business">2. Business details</h2><p><strong>{{ business_legal_name }}</strong>{% if business_address %}<br>{{ business_address }}{% endif %}</p><p>Content My Trip operates online only. We do not have a walk-in office for customers.</p>
+<h2 id="support">3. Account support</h2><p>If you are signed in, <a href="/support">Contact Support</a> opens a ticket tied to your account so we can see your videos and payments straight away. Legal notices and copyright complaints can be sent to the same email address; see the <a href="/auth/terms">Terms and Conditions</a> for what to include.</p>
+
+</article>
+</div>
+</div>
+{% endblock %}

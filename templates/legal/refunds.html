@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Refunds and Cancellation Policy - Content My Trip{% endblock %}
+{% block content %}
+{% include "auth/_legal_styles.html" %}
+<div class="container terms-page">
+<header class="terms-hero"><p class="terms-kicker">Content My Trip legal</p><h1>Refunds and Cancellation Policy</h1><p>What you can cancel, when you get your money back, and how long it takes.</p><div class="terms-meta"><span>Effective: 6 October 2026</span><span>Version 1.0</span></div></header>
+<div class="terms-layout">
+<nav class="terms-nav" aria-label="On this page"><strong>Sections</strong><a href="#overview">1. Overview</a><a href="#autoedit">2. Auto-Edit and credits</a><a href="#plans">3. Professional Creator plans</a><a href="#bids">4. Kreator bids</a><a href="#membership">5. CMT Membership</a><a href="#live">6. Live sessions</a><a href="#process">7. How refunds are processed</a><a href="#contact">8. Contact</a><strong>Related</strong><a href="/auth/terms">Terms and Conditions</a><a href="/auth/privacy">Privacy Policy</a><a href="/auth/refunds">Refunds &amp; Cancellation</a><a href="/auth/contact">Contact Us</a></nav>
+<article class="terms-document">
+
+<h2 id="overview">1. Overview</h2><p>Content My Trip sells digital editing services and memberships; nothing is shipped. All prices are in Indian rupees and include applicable tax, and every payment is taken through Razorpay. This policy says what can be cancelled and when money comes back. Where it says a refund is “reviewed”, that means a member of our team checks the request and approves or declines it; no refund is issued automatically.</p>
+<h2 id="autoedit">2. Auto-Edit and credits</h2><p>Auto-Edit is free, with three attempts per video. An attempt that fails, is cancelled, or produces no output is not counted against you. You can buy extra attempts as a pack of three credits for ₹69; credits belong to the video they were bought for and cannot be moved to another video or account. Credits already used are not refundable. If a pack was bought by mistake and none of its credits have been used, contact us within 7 days and we will refund it.</p>
+<h2 id="plans">3. Professional Creator plans</h2><p>The Basic (₹49) and Advanced (₹99) plans route your footage to a human Kreator. You can pay at upload or choose Pay Later and pay any time before a Kreator starts. A Pay Later upload that is never paid is simply not edited, and its raw footage is deleted after 24 hours; nothing is charged.</p><p>Once paid, you can request a full refund from the assignment page as long as a Kreator has not started work. After work has started, contact us; we will consider a partial or full refund depending on what has been delivered. If we cannot complete an edit we accepted, you are refunded in full.</p>
+<h2 id="bids">4. Kreator bids</h2><p>When you offer a bid for a Kreator to take your edit, the amount is paid when the bid is placed. If the request is declined or cancelled before a Kreator is assigned, the full amount is refunded. After assignment, the rules in section 3 apply.</p>
+<h2 id="membership">5. CMT Membership</h2><p>CMT Membership costs ₹499 per month or ₹4,999 per year, each including bonus days, and gives 10% off paid plans. It does not renew automatically; you choose to renew. You can cancel at any time from your account. Access ends immediately and a pro-rata refund for the unused days, calculated on the amount you actually paid and the full period including bonus days, is filed for review. Upgrading from monthly to yearly credits your unused days against the new price, so nothing needs refunding.</p>
+<h2 id="live">6. Live sessions</h2><p>Watching or hosting a live session is free. No payments are taken for live sessions, so nothing is refundable there.</p>
+<h2 id="process">7. How refunds are processed</h2><p>Approved refunds go back to the original payment method through Razorpay. Banks and card issuers usually show the money within 5 to 7 working days, occasionally longer for some banks; we cannot speed up that part. Where a Razorpay refund is not possible, we will agree an alternative with you. You will receive a confirmation when a refund is approved or declined, with the reason if declined. Kreator earnings are paid out to the bank or UPI details in your wallet and follow the payout rules shown there, not this policy.</p>
+<h2 id="contact">8. Contact</h2><p>To ask about a payment or refund, quote the receipt number from your payment receipt.</p><p>Email <a href="mailto:{{ support_email }}">{{ support_email }}</a>{% if support_phone %} or call {{ support_phone }}{% endif %}, or use <a href="/support">Contact Support</a> from your account.</p>
+
+</article>
+</div>
+</div>
+{% endblock %}
