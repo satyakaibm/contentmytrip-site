@@ -80,15 +80,17 @@ def rich(value):
     v = str(value or "")
     return bullets(v) if (";" in v or "\n" in v) else paras(v)
 
-NAV = '''<header class="site-head"><div class="wrap"><a class="brand" href="/"><img src="/assets/wordmark.png" alt="Content My Trip"></a>
-<nav><a href="/destinations/">Destinations</a><a href="/videos/">Videos</a><a href="/kreators/">Kreators</a><a href="/guides/">Guides</a><a href="/#pricing">Pricing</a><a class="pill" href="/signin/">Sign in</a></nav></div></header>'''
-FOOT = '''<footer class="site-foot"><div class="wrap"><p><strong>Content My Trip LLP</strong> · LLPIN ADC-1855 · 56/2, Doddathogur, Electronics City, Bengaluru 560100, Karnataka, India</p>
-<p><a href="/terms/">Terms and Conditions</a> · <a href="/privacy/">Privacy Policy</a> · <a href="/refunds/">Refunds &amp; Cancellation</a> · <a href="/contact/">Contact Us</a> · <a href="''' + MAIL + '''">contentmytrip@gmail.com</a></p>
-<p>© 2026 Content My Trip LLP. All rights reserved.</p></div></footer>'''
+NAV_LINKS = '<a href="/destinations/">Destinations</a><a href="/videos/">Videos</a><a href="/kreators/">Kreators</a><a href="/guides/">Guides</a><a href="/#pricing">Pricing</a><a class="pill" href="/signin/">Early access</a>'
+NAV = ('<a class="skip-link" href="#main">Skip to content</a><header class="site-head"><div class="wrap"><a class="brand" href="/"><img src="/assets/wordmark.png" alt="Content My Trip"></a>'
+       '<nav class="desktop-nav" aria-label="Main navigation">' + NAV_LINKS + '</nav><details class="mobile-nav"><summary>Menu</summary><nav aria-label="Mobile navigation">' + NAV_LINKS + '</nav></details></div></header>')
+FOOT = ('<footer class="site-foot"><div class="wrap"><div class="footer-grid"><div><p class="kicker">Content-led travel brand</p><h2>Content My Trip</h2><p>Real travel moments. Stories worth sharing. Discover destinations and the kreators who bring them to life.</p></div>'
+        '<div><h3>Explore</h3><a href="/destinations/">Destinations</a><a href="/videos/">Videos</a><a href="/kreators/">Kreators</a><a href="/guides/">AI Tour Guide</a></div>'
+        '<div><h3>Get in touch</h3><a href="/signin/">Early access</a><a href="/contact/">Contact us</a><a href="' + MAIL + '">contentmytrip@gmail.com</a><a href="/terms/">Terms and Conditions</a><a href="/privacy/">Privacy Policy</a><a href="/refunds/">Refunds &amp; Cancellation</a></div></div>'
+        '<div class="footer-bottom"><p><strong>Content My Trip LLP</strong> · LLPIN ADC-1855 · 56/2, Doddathogur, Electronics City, Bengaluru 560100, Karnataka, India</p><p>© 2026 Content My Trip LLP. All rights reserved.</p></div></div></footer>')
 CSS = (ROOT / "templates" / "site.css").read_text()
 BASE = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
         '<title>{% block title %}Content My Trip{% endblock %}</title><meta name="description" content="{% block desc %}Content My Trip turns your travel footage into finished destination videos.{% endblock %}">'
-        '<link rel="icon" href="/assets/favicon.png"><style>' + CSS + '</style></head><body>' + NAV + '<main>{% block content %}{% endblock %}</main>' + FOOT + '</body></html>')
+        '<link rel="icon" href="/assets/favicon.png"><style>' + CSS + '</style></head><body>' + NAV + '<main id="main">{% block content %}{% endblock %}</main>' + FOOT + '</body></html>')
 tpls = {"base.html": BASE}
 for f in (ROOT / "templates" / "legal").glob("*.html"):
     tpls[f"auth/{f.name}"] = f.read_text()
@@ -117,7 +119,7 @@ def video_card(v):
     btns = "".join(f'<a class="btn" href="{esc(u)}" target="_blank" rel="noopener">{n}</a>' for u, n in links if u)
     primary = next((u for u, _ in links if u), None)
     media = f'<img src="{thumb}" alt="{esc(v["title"])}" loading="lazy">' if thumb else '<div class="ph"></div>'
-    if primary: media = f'<a href="{esc(primary)}" target="_blank" rel="noopener">{media}</a>'
+    if primary: media = f'<a aria-label="Watch {esc(v["title"])}" href="{esc(primary)}" target="_blank" rel="noopener">{media}</a>'
     where = f'<a href="/destinations/{d["slug"]}/">{esc(d["name"])}</a>' if d else "Content My Trip"
     return (f'<article class="vcard"><div class="thumb{" land" if not v.get("is_portrait") else ""}">{media}</div>'
             f'<div class="vbody"><h3>{esc(v["title"])}</h3><p class="muted">{where} · {esc(who)}{" · " + date if date else ""}</p>'
@@ -178,26 +180,32 @@ write("signin/index.html", page("Sign in — Content My Trip", "How to use Conte
 
 # ---------- home ----------
 featured_v = [v for v in videos if any(v.get(k) for k in ("youtube_url", "instagram_url", "facebook_url", "tiktok_url"))][:6]
+platforms = [("YouTube", "youtube_url"), ("Instagram", "instagram_url"), ("Facebook", "facebook_url"), ("TikTok", "tiktok_url")]
+reach = "".join(f'<div class="reach-row"><span>{name}</span><strong>{sum(bool(v.get(key)) for v in videos)}</strong></div>' for name, key in platforms)
 write("index.html", page("Content My Trip — travel videos, edited and published", "Content My Trip turns your travel footage into finished destination videos: free Auto-Edit or a professional Kreator, then publishing.",
-    '<section class="hero"><div class="wrap"><h1>Your travel footage, turned into videos worth watching.</h1>'
-    '<p>Content My Trip is a video-editing service for travellers. Upload the clips from your trip, choose a free Auto-Edit or a professional Kreator, and get back a finished destination video you can share or have us publish.</p>'
-    '<a class="cta" href="/videos/">See the videos</a> <a class="cta ghost" href="/destinations/">Browse destinations</a></div></section>'
-    '<section id="how"><div class="wrap"><h2>How it works</h2><div class="grid">'
-    '<div class="card"><h3>1. Upload</h3><p>Send us the raw clips from your trip through the website or the Content My Trip app, and tell us the destination and the story you want.</p></div>'
+    '<section class="hero"><div class="wrap hero-layout"><div><span class="eyebrow">Travel content platform</span><h1>Upload. Edit.<br><span class="accent">Go Viral.</span></h1>'
+    '<p>Your travels deserve more than a camera roll. Explore films made from real traveller footage, shaped by kreators, and shared with the world.</p>'
+    '<a class="cta" href="/videos/">Browse gallery →</a> <a class="cta ghost" href="/signin/">Get early access</a>'
+    f'<div class="hero-stats"><div><strong>{len(videos)}</strong><span>Videos live</span></div><div><strong>{len(destinations)}</strong><span>Destinations</span></div><div><strong>4</strong><span>Platforms</span></div></div></div>'
+    '<aside class="reach" aria-label="Published video counts"><p class="reach-label">Platform reach · published videos</p>' + reach + f'<div class="reach-total"><span class="reach-label">Total stories live</span><strong>{len(videos)}</strong></div></aside></div></section>'
+    '<section style="background:#fafafa"><div class="wrap"><p class="kicker">Fresh from the road</p><h2>Travel stories that feel like being there.</h2><p class="muted">Made from real traveller footage, shaped by talented kreators, and ready to inspire your next escape.</p><div class="grid vgrid">' + "".join(video_card(v) for v in featured_v) + '</div><p style="margin-top:18px"><a class="cta ghost" href="/videos/">All videos</a></p></div></section>'
+    '<section id="how"><div class="wrap"><p class="kicker">Simple by design</p><h2>Your footage. Our craft. One unforgettable story.</h2><p class="muted">The full platform brings your travel moments together in three steps.</p><div class="grid">'
+    '<div class="card"><h3>1. Upload</h3><p>Send us the raw clips from your trip through the full platform or the Content My Trip app, and tell us the destination and the story you want.</p></div>'
     '<div class="card"><h3>2. Edit</h3><p>Run a free Auto-Edit yourself, with music, filters, transitions and your own voice-over, or pick a Professional Creator plan and a human Kreator edits it for you.</p></div>'
     '<div class="card"><h3>3. Publish</h3><p>Download the finished video, or let us publish it on the Content My Trip channels and your connected social accounts.</p></div></div></div></section>'
-    '<section style="background:#fafafa"><div class="wrap"><h2>Recently published</h2><div class="grid vgrid">' + "".join(video_card(v) for v in featured_v) + '</div><p style="margin-top:18px"><a class="cta ghost" href="/videos/">All videos</a></p></div></section>'
-    '<section id="pricing"><div class="wrap"><h2>Pricing</h2><p class="muted">All prices in Indian rupees, tax inclusive. Payments are processed by Razorpay.</p><div class="grid">'
+    '<section id="pricing"><div class="wrap"><h2>Pricing</h2><p class="muted">Platform plans in Indian rupees, tax inclusive. Uploads, editing and payments become available with the full platform launch.</p><div class="grid">'
     '<div class="card"><h3>Auto-Edit</h3><div class="price">Free</div><p>Three attempts per video. Extra attempts: a pack of three credits for ₹69 per video.</p></div>'
     '<div class="card"><h3>Professional Creator · Basic</h3><div class="price">₹49</div><p>Per video. A Kreator edits your footage. Pay at upload or pay later, before work starts.</p></div>'
     '<div class="card"><h3>Professional Creator · Advanced</h3><div class="price">₹99</div><p>Per video. Larger uploads and the full Kreator Studio treatment.</p></div>'
     '<div class="card"><h3>CMT Membership</h3><div class="price">₹499 / month</div><p>or ₹4,999 / year. 10% off every paid plan. Cancel any time with a pro-rata refund for unused days.</p></div>'
     '</div><p class="note" style="margin-top:22px">Refunds are reviewed by our team and returned to the original payment method. See the <a href="/refunds/">Refunds and Cancellation Policy</a>.</p></div></section>'
-    '<section style="background:#fafafa"><div class="wrap"><h2>Destinations</h2><div class="grid dgrid">' + "".join(dest_card(d) for d in destinations[:6]) + '</div><p style="margin-top:18px"><a class="cta ghost" href="/destinations/">All destinations</a></p></div></section>'
+    '<section style="background:#fafafa"><div class="wrap"><p class="kicker">Find your next feeling</p><h2>Go somewhere worth remembering.</h2><p class="muted">Explore places through local insight and real travel stories.</p><div class="grid dgrid">' + "".join(dest_card(d) for d in destinations[:6]) + '</div><p style="margin-top:18px"><a class="cta ghost" href="/destinations/">All destinations</a></p></div></section>'
+    '<section><div class="wrap"><p class="kicker">People behind the stories</p><h2>Meet the kreators shaping every adventure.</h2><div class="grid kgrid">' + ''.join(kreator_card(c) for c in creators[:3]) + '</div><a class="cta ghost" href="/kreators/">Meet the community →</a></div></section>'
     '<section><div class="wrap"><h2>Also on Content My Trip</h2><div class="grid">'
     '<div class="card"><h3>Kreators</h3><p>Approved editors, offered destination-first. <a href="/kreators/">Meet them</a>.</p></div>'
     '<div class="card"><h3>CMT Live</h3><p>Free live destination discussions hosted by approved Kreators, with audience chat and hand-raise. Live sessions are never recorded.</p></div>'
     '<div class="card"><h3>AI Tour Guide</h3><p>A free chat guide for the destinations we cover. <a href="/guides/">About the guide</a>.</p></div></div></div></section>'
+    '<section class="hero"><div class="wrap"><p class="kicker">Start your story</p><h2>Don’t let your best travel moments stay in your camera roll.</h2><p>Get in touch for early access to the Content My Trip platform and apps.</p><a class="cta" href="/signin/">Explore early access →</a> <a class="cta ghost" href="/contact/">Contact us</a></div></section>'
     '<section style="background:#fafafa"><div class="wrap"><h2>About the company</h2><p><strong>Content My Trip LLP</strong> is a limited liability partnership registered in India (LLPIN ADC-1855, incorporated 14 September 2026), with its registered office at 56/2, Doddathogur, Electronics City, Bangalore South, Bengaluru 560100, Karnataka. Reach us at <a href="' + MAIL + '">contentmytrip@gmail.com</a> or via the <a href="/contact/">contact page</a>.</p></div></section>'))
 
 write("404.html", page("Page not found — Content My Trip", "", '<section><div class="wrap"><h2>Page not found</h2><p>Try the <a href="/">home page</a>.</p></div></section>'))
