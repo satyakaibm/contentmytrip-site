@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-"""Build the static Content My Trip showcase site.
+"""Build the static Content My Trip showcase site into dist/.
 
 Reads data/*.json (snapshots exported from the local platform databases by
 snapshot.sh), templates/legal/*.html (the same Jinja templates auth-service
 serves at /auth/terms etc.) and assets/img/*, and writes the HTML pages in
-place. GitHub Pages serves the result. Run:  python3 build.py
+dist/, then checks every internal link. GitHub Actions deploys dist/ to
+Pages on each push to main. Run locally:  python3 build.py
 """
 import json, pathlib, re, html
 from datetime import datetime
 from jinja2 import Environment, DictLoader
 
 ROOT = pathlib.Path(__file__).parent
+DIST = ROOT / "dist"
 CTX = dict(business_legal_name="Content My Trip LLP",
            business_address="56/2, Doddathogur, Electronics City, Bangalore South, Bengaluru 560100, Karnataka, India",
            support_email="contentmytrip@gmail.com", support_phone="")
@@ -97,7 +99,7 @@ def fix(h):
     for a, b in LINKS.items(): h = h.replace(f'href="{a}"', f'href="{b}"')
     return h
 def write(rel, h):
-    out = ROOT / rel; out.parent.mkdir(parents=True, exist_ok=True); out.write_text(h)
+    out = DIST / rel; out.parent.mkdir(parents=True, exist_ok=True); out.write_text(h)
 def page(title, desc, body):
     return env.from_string('{% extends "base.html" %}{% block title %}' + title + '{% endblock %}{% block desc %}' + desc + '{% endblock %}{% block content %}' + body + '{% endblock %}').render(**CTX)
 
@@ -199,5 +201,19 @@ write("index.html", page("Content My Trip — travel videos, edited and publishe
     '<section style="background:#fafafa"><div class="wrap"><h2>About the company</h2><p><strong>Content My Trip LLP</strong> is a limited liability partnership registered in India (LLPIN ADC-1855, incorporated 14 September 2026), with its registered office at 56/2, Doddathogur, Electronics City, Bangalore South, Bengaluru 560100, Karnataka. Reach us at <a href="' + MAIL + '">contentmytrip@gmail.com</a> or via the <a href="/contact/">contact page</a>.</p></div></section>'))
 
 write("404.html", page("Page not found — Content My Trip", "", '<section><div class="wrap"><h2>Page not found</h2><p>Try the <a href="/">home page</a>.</p></div></section>'))
-(ROOT / "CNAME").write_text("www.contentmytrip.com\n"); (ROOT / ".nojekyll").write_text("")
+import shutil
+if (DIST / "assets").exists(): shutil.rmtree(DIST / "assets")
+shutil.copytree(ROOT / "assets", DIST / "assets", ignore=shutil.ignore_patterns(".DS_Store"))
+(DIST / "CNAME").write_text("www.contentmytrip.com\n"); (DIST / ".nojekyll").write_text("")
+
+# ---------- link check: every internal href/src must exist in dist ----------
+broken = []
+for f in DIST.rglob("*.html"):
+    for m in re.finditer(r'(?:href|src)="(/[^"#?]*)', f.read_text()):
+        target = DIST / m.group(1).lstrip("/")
+        if not (target.exists() or (target / "index.html").exists()):
+            broken.append((str(f.relative_to(DIST)), m.group(1)))
+if broken:
+    for page, link in broken: print(f"BROKEN {page} -> {link}")
+    raise SystemExit(f"{len(broken)} broken internal link(s)")
 print(f"built {datetime.now():%Y-%m-%d %H:%M}: {len(destinations)} destinations, {len(videos)} videos, {len(creators)} kreators")
